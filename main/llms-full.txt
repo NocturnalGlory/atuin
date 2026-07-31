@@ -17,7 +17,7 @@ It can also sync your history across all of your machines, end-to-end encrypted.
 ## Quickstart
 
 ```
-bash <(curl --proto '=https' --tlsv1.2 -sSf https://setup.atuin.sh)
+curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
 ```
 
 Restart your shell, then press `Ctrl`+`R` or the `Up` arrow to search. Type a query, press enter to run the selected command, or tab to put it on your command line for editing.
@@ -111,7 +111,7 @@ Setup takes four steps, and only the first is required:
 The install script handles the binary and the shell plugin, and walks you through the rest:
 
 ```
-bash <(curl --proto '=https' --tlsv1.2 -sSf https://setup.atuin.sh)
+curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
 ```
 
 Then restart your shell. Prefer a package manager, or want to install the pieces yourself? See [Installation](https://docs.atuin.sh/guide/installation/index.md).
@@ -198,7 +198,7 @@ Note that the `$PROFILE` path may depend on your PowerShell version.
 
 If you don't wish to use the installer, the manual installation steps are as follows.
 
-It's best to use [rustup](https://rustup.rs/) to set up a Rust toolchain, then you can run:
+Atuin requires a recent Rust toolchain. The minimum supported version is set by `rust-version` in the workspace [`Cargo.toml`](https://github.com/atuinsh/atuin/blob/main/Cargo.toml) (currently 1.97.0). Distribution package managers often ship an older Rust, so it's best to use [rustup](https://rustup.rs/) to set up an up-to-date toolchain, then you can run:
 
 ```
 cargo install atuin --locked
@@ -268,7 +268,7 @@ Atuin is available on WinGet:
 winget install -e Atuinsh.Atuin
 ```
 
-Atuin builds on the latest stable version of Rust, and we make no promises regarding older versions. We recommend using [rustup](https://rustup.rs/).
+Atuin builds on the latest stable version of Rust, and we make no promises regarding older versions. The minimum supported version is set by `rust-version` in the workspace [`Cargo.toml`](https://github.com/atuinsh/atuin/blob/main/Cargo.toml) (currently 1.97.0). We recommend using [rustup](https://rustup.rs/).
 
 ```
 git clone https://github.com/atuinsh/atuin.git
@@ -3929,9 +3929,28 @@ atuin search --limit 1 --reverse cargo
 
 Atuin can also calculate stats based on your history - this is currently a little basic, but more features to come.
 
+`atuin stats` accepts an optional period, which scopes the stats to a window of time. Leave it blank (or pass `all`) for stats since the beginning of your history.
+
+| Period  | Stats window                |
+| ------- | --------------------------- |
+| (blank) | your entire history         |
+| `all`   | your entire history         |
+| `today` | since local midnight        |
+| `week`  | the last 7 days             |
+| `month` | the last 31 days            |
+| `year`  | the last 365 days           |
+| a date  | 24h starting from that date |
+
+```
+$ atuin stats today
+$ atuin stats week
+$ atuin stats month
+$ atuin stats year
+```
+
 ## 1-day stats
 
-You provide the starting point, and Atuin computes the stats for 24h from that point. Date parsing is provided by `interim`, which supports different formats for full or relative dates. Certain formats rely on the dialect option in your [configuration](https://docs.atuin.sh/configuration/config/#dialect) to differentiate day from month. Refer to [the module's documentation](https://docs.rs/interim/latest/interim/#supported-formats) for more details on the supported date formats.
+Any period that isn't one of the keywords above is parsed as a date. You provide the starting point, and Atuin computes the stats for 24h from that point. Date parsing is provided by `interim`, which supports different formats for full or relative dates. Certain formats rely on the dialect option in your [configuration](https://docs.atuin.sh/configuration/config/#dialect) to differentiate day from month. Refer to [the module's documentation](https://docs.rs/interim/latest/interim/#supported-formats) for more details on the supported date formats.
 
 ```
 $ atuin stats last friday
